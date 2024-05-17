@@ -7,6 +7,7 @@ program
   .option("-n, --name <type>", "user name")
   .option("-e, --email <type>", "user email")
   .option("-p, --phone <type>", "user phone");
+
 program.parse();
 
 const options = program.opts();
@@ -15,7 +16,7 @@ async function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case "list":
       const listOfContacts = await contacts.getListOfContacts();
-      return console.log(listOfContacts);
+      return console.table(listOfContacts);
 
     case "get":
       // ... id
