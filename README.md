@@ -14,13 +14,15 @@
 Инициализировать проект с помощью команды `npm init` или `yarn init`. Устанавливаются пакеты *commander* и *nanoid* с помощью команды `yarn add commander nanoid@3.3.4` или `npm install commander nanoid@3.3.4`.
 > Важно! Для работы с CommonJS, нужен nanoid именно версии 3.3.4.
 
-Устанавливается *nodemon* с помощью команды `yarn add nodemon --dev` или `npm install nodemon --save-dev`. Обязательно добавляется *.gitignore* файл в который добавляется папка **node_modules/**. Добавляем скрипты в *package.json* файл (команду dev можно заменить любой другой удобной командой).
+Устанавливается *nodemon* с помощью команды `yarn add nodemon --dev` или `npm install nodemon --save-dev` как зависимость разработки (devDependencies). Обязательно добавляется *.gitignore* файл в который добавляется папка **node_modules/**. Добавляем скрипты в *package.json* файл (команду dev можно заменить любой другой удобной командой).
 ```json
 "scripts": {
     "start": "node index",
     "dev": "nodemon index"
   },
 ```
+> Подробнее о пакетах: [commander](https://www.npmjs.com/package/commander), [nanoid](https://www.npmjs.com/package/nanoid) и [nodemon](https://www.npmjs.com/package/nodemon).
+> 
 С помощью команды `yarn` или `npm install` устанавливаются все зависимости, перечисленные в файле *package.json*, в локальную созданную папку **node_modules**.
 В корне проекта создается папка **db**, в которой создается файл *contacts.json*. Это будет имитация базы данных. В *contacts.json* копируются и вставляются следующие данные:
 ```json
@@ -119,4 +121,33 @@ const updateContactById = async (contactId, data) => {
 Делается экспорт созданных функций с помощью `module.exports = {}`.
 
 ---
-### 3. 
+### 3. Работа с файлом *index.js*
+
+Делается импорт функций из файла *contacts.js* в файл *index.js*.
+```js
+const contacts = require("./contacts");
+```
+Далее создается функция `invokeAction()`, которая получает тип выполняемого действия(`action`) и необходимые аргументы. Функция должна вызвать соответствующий метод из файла *contacts.js*, передавая ему необходимые аргументы. Результат работы вызванной функции выводится в консоль.
+```js
+const invokeAction = async ({ action, id, name, email, phone }) => {
+  switch (action) {
+    case "list":
+      // ...
+    case "get":
+      // ... id
+      return;
+    case "add":
+      // ... name email phone
+      return;
+    case "remove":
+      // ... id
+      return;
+    case "update":
+      // ... id name email phone
+    default:
+      console.warn("\x1B[31m Unknown action type!");
+  }
+}
+```
+
+### 4. 

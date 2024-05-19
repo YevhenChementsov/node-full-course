@@ -13,7 +13,7 @@ const getContactById = async (contactId) => {
   
 }
 
-const addContact = async (data) => {
+const addContact = async (name, email, phone) => {
   
 }
 
@@ -21,7 +21,7 @@ const removeContact = async (contactId) => {
   
 }
 
-const updateContactById = async (contactId, data) => {
+const updateContactById = async (contactId, name, email, phone) => {
   
 }
 
@@ -30,4 +30,5 @@ module.exports = {
 	getContactById,
 	addContact,
 	removeContact,
+	updateContactById
 }
