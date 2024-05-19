@@ -149,7 +149,7 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
   }
 }
 ```
-
+---
 ### 4. Работа с модулем *commander*
 
 Делается импорт *program* из модуля `commander` в файле *index.js*.
@@ -179,5 +179,23 @@ program.parse();
 const options = program.opts();
 invokeAction(options);
 ```
+---
+### 5. Проверка результата работы консольных команд
 
-### 5. 
+Запускаются команды в терминале и проверяются результаты выполнения каждой команды.
+```js
+# Получаем и выводим весь список контактов в виде таблицы (console.table)
+node index.js -a list
+
+# Получаем контакт по id - выводим в консоль объект контакта или null если контакта с таким id не существует
+node index.js -a get -i 05olLMgyVQdWRwgKfg5J6
+
+# Добавляем контакт и выводим в консоль созданный контакт
+node index.js -a add -n Mango -e mango@gmail.com -p 322-22-22
+
+# Удаляем контакт и выводим в консоль удаленный контакт или null если контакта с таким id не существует
+node index.js -a remove -i qdggE76Jtbfd9eWJHrssH
+
+# Редактируем контакт и выводим в консоль отредактированный контакт или null если контакта с таким id не существует
+node index.js -i rsKkOQUi80UsgVPCcLZZW -n Aleks -e Donec.elementum@scelerisquescelerisquedui.net -p (748) 206-2677
+```
