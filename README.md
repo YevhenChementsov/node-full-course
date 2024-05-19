@@ -150,4 +150,34 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
 }
 ```
 
-### 4. 
+### 4. Работа с модулем *commander*
+
+Делается импорт *program* из модуля `commander` в файле *index.js*.
+```js
+const { program } = require("commander");
+```
+Далее делаются настройки консольных команд в `program`,
+```js
+program
+  .option("-a, --action <type>", "choose action")
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
+```
+где:
+- `-a` - сокращение команды
+- `--action <type>` - команда (если не указать `"<type>"`, action будет возвращать boolean - `true` или `false`)
+- `choose action` - описание команды
+
+Далее вызывается метод `parse()`, который читает `process.argv`.
+```js
+program.parse();
+```
+В переменную *options* записывается результат вызова `program.opts()`, который создает объект, где `action` это ключ, а `<type>` - это значение ключа. Передаем *options* аргументом в функцию `invokeAction()`.
+```js
+const options = program.opts();
+invokeAction(options);
+```
+
+### 5. 
