@@ -105,16 +105,16 @@ Add asynchronous functions for working with the contacts collection (*contacts.j
 const getListOfContacts = async () => {
   // ...your code. Returns an array of contacts.
 }
-const getContactById = async (contactId) => {
+const getContactById = async (id) => {
   // ...your code. Returns the contact object with the given id. Returns null if the contact with the given id is not found.
 }
 const addContact = async (data) => {
   // ...your code. Returns the added contact object (with id).
 }
-const removeContact = async (contactId) => {
+const deleteContact = async (id) => {
   // ...your code. Returns the deleted contact object. Returns null if the contact with the given id is not found.
 }
-const updateContactById = async (contactId, data) => {
+const updateContactById = async (id, data) => {
   // ...your code. Returns the edited contact object. Returns null if the contact with the given id is not found.
 }
 ```
@@ -139,7 +139,7 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
     case "add":
       // ... name email phone
       return;
-    case "remove":
+    case "delete":
       // ... id
       return;
     case "update":
@@ -195,7 +195,7 @@ node index.js -a get -i 05olLMgyVQdWRwgKfg5J6
 node index.js -a add -n Mango -e mango@gmail.com -p 322-22-22
 
 # Delete a contact and display the deleted contact object or null if a contact with the given id does not exist.
-node index.js -a remove -i qdggE76Jtbfd9eWJHrssH
+node index.js -a delete -i qdggE76Jtbfd9eWJHrssH
 
 # Edit a contact and display the edited contact object or null if a contact with the given id does not exist.
 node index.js -i rsKkkOQUi80UsgVPCcLZZW -n Aleks -e Donec.elementum@scelerisquescelerisquedui.net -p (748) 206-2677

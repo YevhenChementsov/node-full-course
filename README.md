@@ -105,16 +105,16 @@ const contactsPath = path.join(__dirname, "db", "contacts.json");
 const getListOfContacts = async () => {
   // ...твой код. Возвращает массив контактов.
 }
-const getContactById = async (contactId) => {
+const getContactById = async (id) => {
   // ...твой код. Возвращает объект контакта с таким id. Возвращает null, если контакт с таким id не найден.
 }
 const addContact = async (data) => {
   // ...твой код. Возвращает объект добавленного контакта (с id).
 }
-const removeContact = async (contactId) => {
+const deleteContact = async (id) => {
   // ...твой код. Возвращает объект удаленного контакта. Возвращает null, если контакт с таким id не найден.
 }
-const updateContactById = async (contactId, data) => {
+const updateContactById = async (id, data) => {
   // ...твой код. Возвращает объект отредактированного контакта. Возвращает null, если контакт с таким id не найден.
 }
 ```
@@ -139,7 +139,7 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
     case "add":
       // ... name email phone
       return;
-    case "remove":
+    case "delete":
       // ... id
       return;
     case "update":
@@ -192,11 +192,11 @@ node index.js -a list
 node index.js -a get -i 05olLMgyVQdWRwgKfg5J6
 
 # Добавляем контакт и выводим в консоль созданный контакт.
-node index.js -a add -n Mango -e mango@gmail.com -p 322-22-22
+node index.js -a add -n 'Mango Smith' -e 'mango@gmail.com' -p '(485) 322-22-22'
 
 # Удаляем контакт и выводим в консоль удаленный контакт или null если контакта с таким id не существует.
-node index.js -a remove -i qdggE76Jtbfd9eWJHrssH
+node index.js -a delete -i qdggE76Jtbfd9eWJHrssH
 
 # Редактируем контакт и выводим в консоль отредактированный контакт или null если контакта с таким id не существует.
-node index.js -i rsKkOQUi80UsgVPCcLZZW -n Aleks -e Donec.elementum@scelerisquescelerisquedui.net -p (748) 206-2677
+node index.js -i rsKkOQUi80UsgVPCcLZZW -n 'Aleks Johnson' -e 'Donec.elementum@scelerisquescelerisquedui.net' -p '(748) 206-2677'
 ```

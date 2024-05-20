@@ -105,16 +105,16 @@ const contactsPath = path.join(__dirname, "db", "contacts.json");
 const getListOfContacts = async () => {
   // ...твій код. Повертає масив контактів.
 }
-const getContactById = async (contactId) => {
+const getContactById = async (id) => {
   // ...твій код. Повертає об'єкт контакту з таким id. Повертає null, якщо контакт з таким id не знайдений.
 }
 const addContact = async (data) => {
   // ...твій код. Повертає об'єкт доданого контакту (з id).
 }
-const removeContact = async (contactId) => {
+const deleteContact = async (id) => {
   // ...твій код. Повертає об'єкт видаленого контакту. Повертає null, якщо контакт з таким id не знайдений.
 }
-const updateContactById = async (contactId, data) => {
+const updateContactById = async (id, data) => {
   // ...твій код. Повертає об'єкт відредагованого контакту. Повертає null, якщо контакт з таким id не знайдений.
 }
 ```
@@ -139,7 +139,7 @@ const invokeAction = async ({ action, id, name, email, phone }) => {
     case "add":
       // ... name email phone
       return;
-    case "remove":
+    case "delete":
       // ... id
       return;
     case "update":
@@ -194,7 +194,7 @@ node index.js -a get -i 05olLMgyVQdWRwgKfg5J6
 node index.js -a add -n Mango -e mango@gmail.com -p 322-22-22
 
 # Видаляємо контакт та виводимо в консоль об&apos;єкт видаленого контакту або null, якщо контакту з таким id не існує.
-node index.js -a remove -i qdggE76Jtbfd9eWJHrssH
+node index.js -a delete -i qdggE76Jtbfd9eWJHrssH
 
 # Редагуємо контакт і виводимо в консоль відредагований контакт або null якщо контакту з таким id не існує.
 node index.js -i rsKkkOQUi80UsgVPCcLZZW -n Aleks -e Donec.elementum@scelerisquescelerisquedui.net -p (748) 206-2677
