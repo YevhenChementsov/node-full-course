@@ -191,11 +191,11 @@ node index.js -a list
 node index.js -a get -i 05olLMgyVQdWRwgKfg5J6
 
 # Додаємо контакт та виводимо в консоль об&apos;єкт новоствореного контакту.
-node index.js -a add -n Mango -e mango@gmail.com -p 322-22-22
+node index.js -a add -n 'Mango Smith' -e 'mango@gmail.com' -p '(485) 322-22-22'
 
 # Видаляємо контакт та виводимо в консоль об&apos;єкт видаленого контакту або null, якщо контакту з таким id не існує.
 node index.js -a delete -i qdggE76Jtbfd9eWJHrssH
 
 # Редагуємо контакт і виводимо в консоль відредагований контакт або null якщо контакту з таким id не існує.
-node index.js -i rsKkkOQUi80UsgVPCcLZZW -n Aleks -e Donec.elementum@scelerisquescelerisquedui.net -p (748) 206-2677
+node index.js -i rsKkOQUi80UsgVPCcLZZW -n 'Aleks Johnson' -e 'Donec.elementum@scelerisquescelerisquedui.net' -p '(748) 206-2677'
 ```
