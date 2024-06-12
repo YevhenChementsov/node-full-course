@@ -6,7 +6,7 @@
     "start": "node index",
     "dev": "nodemon index"
   },
-  "repository": "git@github.com:YevhenChementsov/node-cli.git",
+  "repository": "https://github.com/YevhenChementsov/node-full-course/tree/cli",
   "author": "Yevhen Chementsov <yevhenchementsov@gmail.com>",
   "license": "MIT",
   "dependencies": {
