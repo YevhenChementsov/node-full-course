@@ -1,16 +1,8 @@
 {
-  "name": "node-cli",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index",
-    "dev": "nodemon index"
-  },
-  "repository": "git@github.com:YevhenChementsov/node-cli.git",
+  "name": "node-full-course",
+  "repository": "https://github.com/YevhenChementsov/node-full-course/tree/main",
   "author": "Yevhen Chementsov <yevhenchementsov@gmail.com>",
   "license": "MIT",
-  "devDependencies": {
-    "commander": "^12.0.0",
-    "nodemon": "^3.1.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }
