@@ -6,7 +6,7 @@
     "start": "node ./app.js",
     "dev": "nodemon ./app.js"
   },
-  "repository": "https://github.com/YevhenChementsov/node-full-course/tree/rest-api",
+  "repository": "https://github.com/YevhenChementsov/node-full-course/tree/rest-api-express",
   "author": "Yevhen Chementsov <yevhenchementsov@gmail.com>",
   "license": "MIT",
   "devDependencies": {
