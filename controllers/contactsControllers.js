@@ -18,20 +18,12 @@ const getOneContact = async (req, res) => {
 };
 
 const createContact = async (req, res) => {
-  const { error } = schema.validate(req.body);
-  if (error) {
-    throw HttpError(400, error.message);
-  }
   const result = await services.addContact(req.body);
 
   res.status(201).json(result);
 };
 
 const updateContact = async (req, res) => {
-  const { error } = schema.validate(req.body);
-  if (error) {
-    throw HttpError(400, error.message);
-  }
   const { id } = req.params;
   const result = await services.updateContactById(id, req.body);
   if (!result) {

@@ -1,7 +1,7 @@
-const HttpError = require('./');
+const HttpError = require('./HttpError');
 
 const validateBody = schema => {
-  const func = (req, _, next) => {
+  const fn = (req, res, next) => {
     const { error } = schema.validate(req.body);
     if (error) {
       next(HttpError(400, error.message));
@@ -9,7 +9,7 @@ const validateBody = schema => {
     next();
   };
 
-  return func;
+  return fn;
 };
 
 module.exports = validateBody;
