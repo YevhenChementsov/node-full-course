@@ -3,7 +3,7 @@
 
 # Полный курс по Node.js.
 
-- Ветка `cli` - *Работа с файлами в **Node.js**. Создание консольного приложения (**cli**).*
+- Ветка [cli](https://github.com/YevhenChementsov/node-full-course/tree/cli) - *Работа с файлами в **Node.js**. Создание консольного приложения (**cli**).*
 #### Написание **REST API** для работы с коллекцией контактов
-- Ветка `rest-api-express` - *Работа с **Express.js**.*
-- Ветка `rest-api-mongodb` - *Работа с **MongoDB** с помощью графического редактора **MongoDB Compass**. Подключение к **MongoDB** с помощью **Mongoose**.*
+- Ветка [rest-api-express](https://github.com/YevhenChementsov/node-full-course/tree/rest-api-express) - *Работа с **Express.js**.*
+- Ветка [rest-api-mongodb](https://github.com/YevhenChementsov/node-full-course/tree/rest-api-mongodb) - *Работа с **MongoDB** с помощью графического редактора **MongoDB Compass**. Подключение к **MongoDB** с помощью **Mongoose**.*
