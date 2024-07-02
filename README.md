@@ -1,9 +1,6 @@
 **Читать на других языках: [Русский](README.md),
-[Українська](README.ua.md), [English](README.en.md).**
+[Українська](./docs/README.ua.md), [English](./docs/README.en.md).**
 
-# Полный курс по Node.js.
+# MongoDB и Mongoose.
 
-- Ветка `cli` - *Работа с файлами в **Node.js**. Создание консольного приложения (**cli**).*
-#### Написание **REST API** для работы с коллекцией контактов
-- Ветка `rest-api-express` - *Работа с **Express.js**.*
-- Ветка `rest-api-mongodb` - *Работа с **MongoDB** с помощью графического редактора **MongoDB Compass**. Подключение к **MongoDB** с помощью **Mongoose**.*
+---
