@@ -1,4 +1,4 @@
-**Читать на других языках: [Русский](README.md), [Українська](README.ua.md),
+**Читать на других языках: [Українська](README.ua.md),
 [English](README.en.md).**
 
 # Express.js.
@@ -16,7 +16,7 @@
 
 Инициализируется проект с помощью команды `yarn init`. Устанавливаются
 **_cors_**, **_express_**, **_joi_**, **_morgan_**, **_nanoid_** с помощью
-команды `yarn add cors express joi morgan nanoid` как зависимость
+команды `yarn add cors express joi morgan nanoid@3.3.4` как зависимость
 (dependencies), **_nodemon_** с помощью команды `yarn add nodemon --dev` как
 зависимость разработки (devDependencies). Обязательно добавляется _.gitignore_
 файл в который добавляется папка **node_modules/**. Добавляем скрипты в
