@@ -1,5 +1,5 @@
 **Read in other languages: [Русский](../README.md),
-[Українська](./README.ua.md), [English](./README.en.md).**
+[Українська](./README.ua.md).**
 
 # Working with files in Node.js. Creating a console application.
 ---

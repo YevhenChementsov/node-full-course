@@ -1,5 +1,4 @@
-**Читать на других языках: [Русский](README.md),
-[Українська](./docs/README.ua.md), [English](./docs/README.en.md).**
+**Читать на других языках: [Українська](./docs/README.ua.md), [English](./docs/README.en.md).**
 
 # Работа с файлами в Node.js. Создание консольного приложения.
 ---
