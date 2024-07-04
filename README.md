@@ -1,5 +1,5 @@
-**Читать на других языках: [Українська](README.ua.md),
-[English](README.en.md).**
+**Читать на других языках: [Українська](./docs/README.ua.md),
+[English](./docs/README.en.md).**
 
 # Express.js.
 
