@@ -1,2 +1,2 @@
-**Читать на других языках: [Русский](../README.md), [Українська](README.ua.md),
-[English](README.en.md).**
+**Read in other languages: [Русский](../README.md),
+[Українська](README.ua.md).**

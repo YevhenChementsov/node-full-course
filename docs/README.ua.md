@@ -1,2 +1,1 @@
-**Читать на других языках: [Русский](README.md),
-[Українська](README.ua.md), [English](README.en.md).**
+**Читати іншими мовами: [Русский](README.md), [English](README.en.md).**
