@@ -211,3 +211,84 @@ module.exports = Contact;
 ---
 
 ### 6. Добавление нового маршрута @ PATCH /api/contacts/:id/favorite
+
+В контактах появляется дополнительное поле статуса _favorite_, которое принимает
+логическое значение true или false. Оно отвечает за то, что в избранном или нет
+находится указанный контакт. Реализуется для обновления статуса контакта новый
+рут:
+
+<details>
+<summary>@ PATCH /api/contacts/:id/favorite</summary>
+
+- Получает параметр `id`
+- Получает `body` в json-формате c обновлением поля `favorite`
+- Если `body` нет, возвращает json с ключом {"message": "missing field
+  favorite"} и статусом `400`
+- Если с `body` все хорошо, вызывает функцию
+  _`updateFavorite(id, body, { new: true })`_ (добавляется к
+  /controllers/contacts) для обновления контакта в базе. Третьим аргументом
+  передается объект `{ new: true }`, чтобы возвращался обновленный контакт.
+- По результату работы функция возвращает обновленный объект контакта со
+  статусом `200`. В противном случае, возвращает json с ключом
+  `"message": "Not found"` и статусом `404`
+
+</details>
+
+---
+
+### 7. Валидация для @ PATCH
+
+Так как patch обновляет одно поле, для него отдельно пишется валидация. Для
+удобства, mongoose-валидацию и joi-валидацию лучше хранить в одном файле.
+Поэтому содержимое файла _`contactsSchema.js`_ из папки **schemas** переносится
+в файл _`contact.js`_, который находится в папке **models**,
+_`contactsSchema.js`_ и папка **schemas** удаляются.
+
+```js
+// contact.js
+const Joi = require('joi');
+//* Regular expression for name
+const nameRegExp = /^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/;
+//* Regular expression for phone
+const phoneRegExp =
+  /^\+?\d{0,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+//* Joi validation
+const addSchema = Joi.object({
+  name: Joi.string().pattern(nameRegExp).min(3).max(30).required().messages({
+    'string.base': 'Name should be a string',
+    'string.pattern.base': 'Name should be a string',
+    'string.empty': 'Name cannot be an empty field',
+    'string.min': 'Name should have a minimum of {#limit} letters',
+    'string.max': 'Name should have a maximum of {#limit} letters',
+    'any.required': 'Name is a required field',
+  }),
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required()
+    .messages({
+      'string.email': 'Please enter a valid email address',
+      'string.empty': 'Email cannot be an empty field',
+      'any.required': 'Email is a required field',
+    }),
+  phone: Joi.string().pattern(phoneRegExp).required().messages({
+    'string.pattern.base': 'Phone number must be in the format (012) 345-67-89',
+    'string.empty': 'Phone number cannot be an empty field',
+    'any.required': 'Phone number is a required field',
+  }),
+  favorite: Joi.bool(),
+});
+
+const updateFavoriteSchema = Joi.object({
+  favorite: Joi.bool().required(),
+});
+
+const schemas = {
+  addSchema,
+  updateFavoriteSchema,
+};
+
+module.exports = {
+  Contact,
+  schemas,
+};
+```
