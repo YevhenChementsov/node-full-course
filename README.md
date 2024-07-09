@@ -119,4 +119,77 @@ DB_HOST =
 
 ---
 
-### 4. Создание mongoose схемы и модели.
+### 4. Создание схемы модели контактов.
+
+Создается файл _`contact.js`_ в папке **models** в котором будет храниться схема
+и модель коллекции контактов. Для этого импортируется с mongoose схема и модель:
+
+```js
+// contact.js
+const { Schema, model } = require('mongoose');
+```
+
+Создается схема модели для коллекции contacts:
+
+```js
+// contact.js
+const contactSchema = new Schema(
+  {
+    name: {
+      type: String,
+      match: nameRegExp,
+      required: [true, 'Name is a required field'],
+    },
+    email: {
+      type: String,
+      required: [true, 'Email is a required field'],
+    },
+    phone: {
+      type: String,
+      match: phoneRegExp,
+      required: [true, 'Phone is a required field'],
+    },
+    favorite: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { versionKey: false, timestamps: true },
+);
+```
+
+Методы mongoose выбрасывают ошибку без статуса и поэтому он по умолчанию
+ставится `500` (когда доходит до _`app.js`_). Исправляется отображение статуса с
+помощью функции-хелпера _`handleMongooseError`_, которая создается в папке
+**helpers**.
+
+```js
+// helpers/handleMongooseError.js
+const handleMongooseError = (error, data, next) => {
+  error.status = 400;
+  next();
+};
+
+module.exports = handleMongooseError;
+```
+
+Далее импортируется функция _`handleMongooseError`_, создается модель и экспорт
+коллекции contacts:
+
+```js
+// contact.js
+const { handleMongooseError } = require('../helpers');
+
+...
+
+contactSchema.post('save', handleMongooseError);
+
+const Contact = model('contact', contactSchema);
+
+module.exports = Contact;
+```
+
+> Важно! Первый аргумент модели должно быть имя существительное в единственном
+> числе.
+
+### 5. Переписывание функций обработки запросов - controllers.
