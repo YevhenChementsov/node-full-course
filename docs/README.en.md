@@ -28,11 +28,11 @@ The graphical editor is installed
 graphical editor for convenient work with the database for MongoDB. The
 connection of the cloud database to Compass.
 
-![first step](./docs/images/1_step.jpg)
+![first step](./images/1_step.jpg)
 
-![second step](./docs/images/2_step.jpg)
+![second step](./images/2_step.jpg)
 
-![third step](./docs/images/3_step.jpg)
+![third step](./images/3_step.jpg)
 
 The copied string is pasted into the MongoDB Compass url. In the string, the
 word ‘<password>’ is replaced with the MongoDB password.
@@ -100,7 +100,7 @@ mongoose
 In the _`DB_HOST`_ environment variable in the _`.env`_ file, the copied string
 from MongoDB:
 
-![fourth step](./docs/images/4_step.jpg) ![fifth step](./docs/images/5_step.jpg)
+![fourth step](./images/4_step.jpg) ![fifth step](./images/5_step.jpg)
 
 The name of the database _`db-contacts`_ is written before the question mark in
 the copied line.

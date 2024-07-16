@@ -27,11 +27,11 @@
 зручної роботи з базою даних для MongoDB. Налаштовується підключення хмарної
 бази даних до Compass.
 
-![first step](./docs/images/1_step.jpg)
+![first step](./images/1_step.jpg)
 
-![second step](./docs/images/2_step.jpg)
+![second step](./images/2_step.jpg)
 
-![third step](./docs/images/3_step.jpg)
+![third step](./images/3_step.jpg)
 
 Скопійований рядок вставляється в MongoDB Compass url. У рядку слово
 `<password>` замінюється на пароль від MongoDB.
@@ -98,7 +98,7 @@ mongoose
 У змінну оточення _`DB_HOST`_ у файлі _`.env`_ вставляється скопійований рядок з
 MongoDB:
 
-![fourth step](./docs/images/4_step.jpg) ![fifth step](./docs/images/5_step.jpg)
+![fourth step](./images/4_step.jpg) ![fifth step](./images/5_step.jpg)
 
 Перед знаком питання в скопійованому рядку прописується назва бази даних
 _`db-contacts`_
