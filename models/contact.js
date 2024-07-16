@@ -3,7 +3,7 @@ const Joi = require('joi');
 
 const { handleMongooseError, regexp } = require('../helpers');
 
-//* Mongoose DB validation schema
+//* Mongoose contacts DB validation schema
 const contactSchema = new Schema(
   {
     name: {
@@ -34,7 +34,9 @@ const contactSchema = new Schema(
 
 contactSchema.post('save', handleMongooseError);
 
-//* Joi validation
+const Contact = model('contact', contactSchema);
+
+//* Contacts Joi validation
 const addSchema = Joi.object({
   name: Joi.string()
     .pattern(regexp.nameRegExp)
@@ -49,14 +51,11 @@ const addSchema = Joi.object({
       'string.max': 'Name should have a maximum of {#limit} letters',
       'any.required': 'Name is a required field',
     }),
-  email: Joi.string()
-    .email({ tlds: { allow: false } })
-    .required()
-    .messages({
-      'string.email': 'Please enter a valid email address',
-      'string.empty': 'Email cannot be an empty field',
-      'any.required': 'Email is a required field',
-    }),
+  email: Joi.string().pattern(regexp.emailRegExp).required().messages({
+    'string.email': 'Please enter a valid email address',
+    'string.empty': 'Email cannot be an empty field',
+    'any.required': 'Email is a required field',
+  }),
   phone: Joi.string().pattern(regexp.phoneRegExp).required().messages({
     'string.pattern.base': 'Phone number must be in the format (012) 345-67-89',
     'string.empty': 'Phone number cannot be an empty field',
@@ -73,8 +72,6 @@ const schemas = {
   addSchema,
   updateFavoriteSchema,
 };
-
-const Contact = model('contact', contactSchema);
 
 module.exports = {
   Contact,
