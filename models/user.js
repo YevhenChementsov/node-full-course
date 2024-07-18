@@ -6,6 +6,11 @@ const { handleMongooseError, regexp } = require('../helpers');
 //* Mongoose users DB validation schema
 const userSchema = new Schema(
   {
+    name: {
+      type: String,
+      minlength: 3,
+      maxlength: 30,
+    },
     password: {
       type: String,
       minlength: [
@@ -38,7 +43,7 @@ userSchema.post('save', handleMongooseError);
 const User = model('user', userSchema);
 
 //* Users Joi validation
-const signupSchema = Joi.object({
+const signUpSchema = Joi.object({
   name: Joi.string()
     .pattern(regexp.nameRegExp)
     .min(3)
@@ -65,7 +70,7 @@ const signupSchema = Joi.object({
 });
 
 const schemas = {
-  signupSchema,
+  signUpSchema,
 };
 
 module.exports = {
