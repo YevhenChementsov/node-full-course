@@ -4,7 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const authRouter = require('./routes/auth');
-const contactsRouter = require('./routes/contactsRouter');
+const contactsRouter = require('./routes/contacts');
 
 const app = express();
 
