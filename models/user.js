@@ -69,8 +69,22 @@ const signUpSchema = Joi.object({
   }),
 });
 
+const signInSchema = Joi.object({
+  email: Joi.string().pattern(regexp.emailRegExp).required().messages({
+    'string.email': 'Please enter a valid email address',
+    'string.empty': 'Email cannot be an empty field',
+    'any.required': 'Email is a required field',
+  }),
+  password: Joi.string().min(6).required().messages({
+    'string.min': 'Password should have a minimum of {#limit} symbols',
+    'string.empty': 'Password cannot be an empty field',
+    'any.required': 'Password is a required field',
+  }),
+});
+
 const schemas = {
   signUpSchema,
+  signInSchema,
 };
 
 module.exports = {
