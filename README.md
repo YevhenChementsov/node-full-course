@@ -168,3 +168,76 @@ router.post('/signup', validateBody(schemas.signUpSchema), ctrlWrapper(ctrl.sign
 ---
 
 ### 3. Авторизация (Логин).
+
+Создается эндпоинт `/api/auth/signin`.
+
+В файл _`user.js`_ что в папке **models** добавляется и экспортируется
+Joi-валидация необходимых полей при авторизации (`email` и `password`).
+
+```js
+// models/user.js
+...
+const signInSchema = Joi.object({
+  email: Joi.string().pattern(regexp.emailRegExp).required().messages({
+    'string.email': 'Please enter a valid email address',
+    'string.empty': 'Email cannot be an empty field',
+    'any.required': 'Email is a required field',
+  }),
+  password: Joi.string().min(6).required().messages({
+    'string.min': 'Password should have a minimum of {#limit} symbols',
+    'string.empty': 'Password cannot be an empty field',
+    'any.required': 'Password is a required field',
+  }),
+});
+
+const schemas = {
+  signUpSchema,
+  signInSchema,
+};
+
+module.exports = {
+  User,
+  schemas,
+};
+```
+
+Создается файл _`signin.js`_ в папке **controllers/auth**. В файле создается
+контроллер-функция `signIn()` для проверки и авторизации существующего
+пользователя по данным, которые прошли валидацию (`email` и `password`).
+
+- Если `email` не существует в базе данных, то выбрасывается ошибка со статусом
+  `401` и сообщением `'Invalid email or password'`
+- Если `email` существует в базе данных, но `password` не совпадает, то
+  выбрасывается ошибка со статусом `401` и сообщением
+  `'Invalid email or password'`
+- Если успешно - сгенерировать и вернуть токен `{ token: generated token }` со
+  статусом `200`
+
+Для генерации токена используется библиотека
+[jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken).
+
+Чтобы сгенерировать токен в файл _`.env`_ добавляется секретный ключ
+(SECRET_KEY). Он может быть произвольным или сгенерирован с помощью сайта
+(например [randomkeygen](https://randomkeygen.com/)).
+
+Далее в контроллер авторизации - `signIn()`-функцию импортируется jwt
+библиотека, SECRET_KEY из `process.env`. Создается `payload` необходимый для
+генерации jwt токена.
+
+Создается токен из `payload`, `SECRET_KEY` и объекта настроек, в котором
+указывается время жизни токена.
+
+```js
+// signin.js
+...
+const jwt = require('jsonwebtoken');
+
+const { SECRET_KEY } = process.env;
+...
+const payload = {
+  id: user._id,
+}
+const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+```
+
+### 4. Проверка токена.

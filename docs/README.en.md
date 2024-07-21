@@ -157,3 +157,74 @@ router.post('/signup', validateBody(schemas.signUpSchema), ctrlWrapper(ctrl.sign
 ---
 
 ### 3. Authorization (Login).
+
+An endpoint `/api/auth/signin` is created.
+
+In the file _`user.js`_ in the **models** folder is added and exported.
+Joi-validation of necessary fields at authorization (`email` and `password`).
+
+```js
+// models/user.js
+...
+const signInSchema = Joi.object({
+  email: Joi.string().pattern(regexp.emailRegExp).required().messages({
+    'string.email': 'Please enter a valid email address',
+    'string.empty': 'Email cannot be an empty field',
+    'any.required': 'Email is a required field',
+  }),
+  password: Joi.string().min(6).required().messages({
+    'string.min': 'Password should have a minimum of {#limit} symbols',
+    'string.empty': 'Password cannot be an empty field',
+    'any.required': 'Password is a required field',
+  }),
+});
+
+const schemas = {
+  signUpSchema,
+  signInSchema,
+};
+
+module.exports = {
+  User,
+  schemas,
+};
+```
+
+The _`signin.js`_ file is created in the **controllers/auth** folder. In the
+file a controller-function `signIn()` is created to check and authorize an
+existing user by the data that passed validation (`email` and `password`).
+
+- If `email` does not exist in the database, an error is thrown with status
+  `401` and the message `Invalid email or password`.
+- If `email` exists in the database, but `password` does not match, an error
+  with status `401` and message `Invalid email or password` is thrown.
+- If successful - generate and return token `{ token: generated token }` with
+  status `200`.
+- The [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken) library is used
+  to generate the token.
+
+To generate a token, a secret key is added to the _`.env`_ file (SECRET_KEY). It
+can be random or generated using a website (e.g.
+[randomkeygen](https://randomkeygen.com/)).
+
+Next, the authorization controller - `signIn()` function imports the jwt
+library, SECRET_KEY from `process.env`. The `payload` necessary for the jwt
+token generation.
+
+A token is created from `payload`, `SECRET_KEY` and a settings object, which
+token lifetime is specified.
+
+```js
+// signin.js
+...
+const jwt = require('jsonwebtoken');
+
+const { SECRET_KEY } = process.env;
+...
+const payload = {
+  id: user._id,
+}
+const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+```
+
+### 4. Checking the token.
