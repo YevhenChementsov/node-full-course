@@ -227,4 +227,4 @@ const payload = {
 const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
 ```
 
-### 4. Checking the token.
+### 4. Token Verification / Authentication.

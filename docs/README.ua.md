@@ -227,4 +227,4 @@ const payload = {
 const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
 ```
 
-### 4. Перевірка токена.
+### 4. Перевірка / Аутентифікація токена.
