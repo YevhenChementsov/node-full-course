@@ -310,3 +310,28 @@ The middleware _`authenticate`_ is added to all CRUD requests root
 _`contacts.js`_.
 
 ### 5. Pagination.
+
+To retrieve search parameters from a query string, `req.query` is used. In the
+_`getAll.js`_ controller function in the **controllers/contacts/** folder,
+`page` and `limit` are taken from the `req.query` object. By default, the `page`
+parameter is set to `1` and the `limit` parameter is set to `10`.
+
+```js
+// controllers/contacts/getAll.js
+const { page = 1, limit = 10 } = req.query;
+```
+
+In the `find()` method the third argument of the query is used to specify the
+additional settings built into the mongoose additional settings (`skip` and
+`limit`). `skip` is calculated by formula `(page - 1) * limit`. The result is
+returned:
+
+```js
+// controllers/contacts/getAll.js
+const result = await Contact.find({ owner }, '', {
+  skip,
+  limit,
+}).populate('owner', 'name email');
+
+res.json(result);
+```

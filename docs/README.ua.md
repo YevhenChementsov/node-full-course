@@ -310,3 +310,27 @@ const result = await Contact.find({ owner }).populate('owner', 'name email');
 Мідлвар _`authenticate`_ додається до всіх CRUD-запитів рута _`contacts.js`_.
 
 ### 5. Пагінація.
+
+Для отримання параметрів пошуку з рядка запиту використовується `req.query`. У
+функції-контролері _`getAll.js`_, що в папці **controllers/contacts/**, з
+об'єкта `req.query` беруться `page` і `limit`. За замовчуванням параметр `page`
+ставиться `1`, а параметр `limit` - `10`.
+
+```js
+// controllers/contacts/getAll.js
+const { page = 1, limit = 10 } = req.query;
+```
+
+У методі `find()` під час запиту третім аргументом прописуються вбудовані в
+mongoose додаткові налаштування (`skip` і `limit`). `skip` вираховується за
+формулою `(page - 1) * limit`. У результаті повертається:
+
+```js
+// controllers/contacts/getAll.js
+const result = await Contact.find({ owner }, '', {
+  skip,
+  limit,
+}).populate('owner', 'name email');
+
+res.json(result);
+```
