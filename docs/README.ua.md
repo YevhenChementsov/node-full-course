@@ -228,3 +228,85 @@ const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
 ```
 
 ### 4. Перевірка / Аутентифікація токена.
+
+Створюється мідлвара _`authenticate.js`_ у папці **middlewares** для перевірки
+токена і додається до всіх маршрутів контактів, які мають бути захищені.
+
+- Мідлвар бере токен із заголовків `Authorization`, перевіряє токен на
+  валідність
+
+```js
+// authenticate.js
+const { authorization = '' } = req.headers;
+const [bearer, token] = authorization.split(' ');
+```
+
+- Якщо токен не валідний, викидає помилку зі статусом `401` і повідомленням
+  `'Unauthorized'`
+
+```js
+// authenticate.js
+if (bearer !== 'Bearer') {
+  next(HttpError(401));
+}
+```
+
+- Якщо валідація пройшла успішно, отримати з токена `id` користувача. Знайти
+  користувача в базі даних за цим `id`
+
+```js
+// authenticate.js
+const { id } = jwt.verify(token, SECRET_KEY);
+const user = await User.findById(id);
+```
+
+- Якщо користувача з таким `id` не існує або токени не збігаються, повернути
+  помилку зі статусом `401` і повідомленням `'Unauthorized'`
+
+```js
+// authenticate.js
+if (!user) {
+  next(HttpError(401, 'User not found.'));
+}
+```
+
+- Якщо користувач існує і токен збігається з тим, що знаходиться в базі,
+  записати його дані в `req.user` і викликати метод `next()`
+
+```js
+// authenticate.js
+req.user = user;
+next();
+```
+
+Після того як дані користувача записані, при додаванні контакту, з `req.user`
+береться `id` користувача і додається до запиту. Після цього всі додані контакти
+будуть приписуватися в базі даних тільки до залогіненого користувачеві
+`_id: owner`.
+
+```js
+// controllers/contacts/add.js
+const { _id: owner } = req.user;
+const result = await Contact.create({ ...req.body, owner });
+```
+
+Теж саме робиться і з запитом усіх контактів.
+
+```js
+// controllers/contacts/getAll.js
+const { _id: owner } = req.user;
+const result = await Contact.find({ owner });
+```
+
+Тепер користувач отримуватиме тільки свої контакти. Щоб під час запиту в поле
+`owner` записувало не `id`, а, наприклад, ім'я та пошту користувача, який робить
+запит, після запиту додається `populate()`.
+
+```js
+// controllers/contacts/getAll.js
+const result = await Contact.find({ owner }).populate('owner', 'name email');
+```
+
+Мідлвар _`authenticate`_ додається до всіх CRUD-запитів рута _`contacts.js`_.
+
+### 5. Пагінація.

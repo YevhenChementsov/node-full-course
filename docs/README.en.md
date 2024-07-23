@@ -228,3 +228,85 @@ const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
 ```
 
 ### 4. Token Verification / Authentication.
+
+A middleware _`authenticate.js`_ in the **middlewares** folder is created to
+validate the token and added to all contact routes that need to be protected.
+
+- Middleware takes the token from the `Authorization` headers, checks the token
+  for validity
+
+```js
+// authenticate.js
+const { authorization = '' } = req.headers;
+const [bearer, token] = authorization.split(' ');
+```
+
+- If the token is not valid, it throws an error with status `401` and message
+  `'Unauthorized'`
+
+```js
+// authenticate.js
+if (bearer !== 'Bearer') {
+  next(HttpError(401));
+}
+```
+
+- If validation is successful, get the `id` of the user from the token. Find the
+  user in the database by this `id`
+
+```js
+// authenticate.js
+const { id } = jwt.verify(token, SECRET_KEY);
+const user = await User.findById(id);
+```
+
+- If the user with such `id` does not exist or tokens do not match, return an
+  error with status `401` and message `'Unauthorized'`
+
+```js
+// authenticate.js
+if (!user) {
+  next(HttpError(401, 'User not found.'));
+}
+```
+
+- If the user exists and the token matches the one in the database, write his
+  data to `req.user` and call the `next()` method
+
+```js
+// authenticate.js
+req.user = user;
+next();
+```
+
+Once the user data is recorded, when adding a contact, the `id` of the user is
+taken from `req.user` and added to the query. After that all added contacts will
+be assigned in the database only to the logged in user `_id: owner`.
+
+```js
+// controllers/contacts/add.js
+const { _id: owner } = req.user;
+const result = await Contact.create({ ...req.body, owner });
+```
+
+The same is done for requesting all contacts.
+
+```js
+// controllers/contacts/getAll.js
+const { _id: owner } = req.user;
+const result = await Contact.find({ owner });
+```
+
+Now the user will receive only his contacts. So that when requesting in the
+`owner` field will be written not `id`, but for example the name and email of
+the user who makes the request, `populate()` is added after the request.
+
+```js
+// controllers/contacts/getAll.js
+const result = await Contact.find({ owner }).populate('owner', 'name email');
+```
+
+The middleware _`authenticate`_ is added to all CRUD requests root
+_`contacts.js`_.
+
+### 5. Pagination.
