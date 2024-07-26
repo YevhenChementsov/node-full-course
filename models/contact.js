@@ -13,6 +13,7 @@ const contactSchema = new Schema(
     },
     email: {
       type: String,
+      match: regexp.emailRegExp,
       required: [true, 'Email is a required field'],
     },
     phone: {
@@ -54,6 +55,7 @@ const addSchema = Joi.object({
     }),
   email: Joi.string().pattern(regexp.emailRegExp).required().messages({
     'string.email': 'Please enter a valid email address',
+    'string.pattern.base': 'Please enter a valid email address',
     'string.empty': 'Email cannot be an empty field',
     'any.required': 'Email is a required field',
   }),
