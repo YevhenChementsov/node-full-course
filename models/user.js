@@ -10,6 +10,7 @@ const userSchema = new Schema(
       type: String,
       minlength: 3,
       maxlength: 30,
+      required: [true, 'Name is required'],
     },
     password: {
       type: String,
@@ -82,9 +83,21 @@ const signInSchema = Joi.object({
   }),
 });
 
+const updateUserSubscriptionSchema = Joi.object({
+  subscription: Joi.string()
+    .valid('starter', 'pro', 'business')
+    .required()
+    .messages({
+      'any.only': 'Subscription must be one of: starter, pro or business',
+      'string.empty': 'Subscription cannot be an empty field',
+      'any.required': 'Subscription is a required field',
+    }),
+});
+
 const schemas = {
   signUpSchema,
   signInSchema,
+  updateUserSubscriptionSchema,
 };
 
 module.exports = {

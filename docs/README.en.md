@@ -7,7 +7,7 @@
 
 Creating a collection of users users. Add logic authentication/authorization of
 user via JWT token. Retrieving user data by token. Filtering and pagination of
-contacts. Updating user subscription.
+contacts. Updating user subscription. Logout.
 
 ---
 

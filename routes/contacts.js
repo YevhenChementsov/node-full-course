@@ -5,20 +5,20 @@ const { ctrlWrapper } = require('../helpers');
 const { validateBody, isValidId, authenticate } = require('../middlewares');
 const { schemas } = require('../models/contact');
 
-const contactsRouter = Router();
+const router = Router();
 
-contactsRouter.get('/', authenticate, ctrlWrapper(ctrl.getAll));
+router.get('/', authenticate, ctrlWrapper(ctrl.getAll));
 
-contactsRouter.get('/:id', authenticate, isValidId, ctrlWrapper(ctrl.getOne));
+router.get('/:id', authenticate, isValidId, ctrlWrapper(ctrl.getOne));
 
-contactsRouter.post(
+router.post(
   '/',
   authenticate,
   validateBody(schemas.addSchema),
   ctrlWrapper(ctrl.add),
 );
 
-contactsRouter.put(
+router.put(
   '/:id',
   authenticate,
   isValidId,
@@ -26,7 +26,7 @@ contactsRouter.put(
   ctrlWrapper(ctrl.update),
 );
 
-contactsRouter.patch(
+router.patch(
   '/:id/favorite',
   authenticate,
   isValidId,
@@ -34,11 +34,6 @@ contactsRouter.patch(
   ctrlWrapper(ctrl.updateFavorite),
 );
 
-contactsRouter.delete(
-  '/:id',
-  authenticate,
-  isValidId,
-  ctrlWrapper(ctrl.remove),
-);
+router.delete('/:id', authenticate, isValidId, ctrlWrapper(ctrl.remove));
 
-module.exports = contactsRouter;
+module.exports = router;

@@ -8,7 +8,7 @@
 Создание коллекции пользователей users. Добавление логики
 аутентификации/авторизации пользователя с помощью JWT токена. Получение данных
 юзера по токену. Фильтрация и пагинация контактов. Обновление подписки
-пользователя.
+пользователя. Логаут.
 
 ---
 
@@ -323,7 +323,7 @@ const result = await Contact.find({ owner }).populate('owner', 'name email');
 
 Мидлвар _`authenticate`_ добавляется ко всем CRUD-запросам рута _`contacts.js`_.
 
-### 5. Пагинация.
+### 5. Пагинация для коллекции контактов @ GET /contacts?page=1&limit=20.
 
 Для получения параметров поиска из строки запроса используется `req.query`. В
 функции-контроллере _`getAll.js`_ что в папке **controllers/contacts/** из
@@ -348,3 +348,111 @@ const result = await Contact.find({ owner }, '', {
 
 res.json(result);
 ```
+
+### 6. Текущий пользователь - получение данных юзера по токену.
+
+Создается эндпоинт `/api/users/current`.
+
+- Создается рут `@ GET /current` в файле _`users.js`_, в папке **routes**. Также
+  импортируется _`authenticate`_ из папки **middlewares** и _`ctrlWrapper`_ из
+  папки **helpers**. В файле _`app.js`_ создается _`usersRouter`_. Для нового
+  рута создается контроллер
+- Мидлвар _`authenticate`_ проверяет токен авторизированного пользователя
+- Если пользователь не найден, токен не правильный или его время истекло -
+  выбрасывается ошибка со статусом `401` и сообщением `'Unauthorized'`
+- Если все хорошо, функция-контроллер возвращает статус `200` и объект с именем
+  пользователя и его подпиской
+
+```js
+// controllers/users/getCurrentUser.js
+const getCurrentUser = async (req, res) => {
+  const { name, subscription } = req.user;
+
+  res.json({
+    name,
+    subscription,
+  });
+};
+```
+
+### 7. Фильтрация контактов по полю избранного @ GET /contacts?favorite=true
+
+Для того, чтобы отфильтровать контакты в функции-контроллере _`getAll.js`_ что в
+папке **controllers/contacts/** из объекта `req.query` кроме `page` и `limit`
+еще берется `favorite` и делается проверка с помощью оператора `if(){}`.
+
+```js
+// controllers/contacts/getAll.js
+...
+const { page = 1, limit = 10, favorite } = req.query;
+...
+const getFavorite = { owner };
+if (favorite) {
+  getFavorite.favorite = favorite === 'true';
+}
+const result = await Contact.find(getFavorite, '', {
+  skip,
+  limit,
+}).populate('owner', 'name email');
+```
+
+### 8. Обновление подписки (subscription) пользователя через эндпоинт @ PATCH /users.
+
+Чтобы добавить возможность обновления подписки пользователя через эндпоинт @
+PATCH /users, нужно создать маршрут, который будет обрабатывать запрос на
+обновление поля subscription в модели пользователя. Также нужно добавить
+валидацию, чтобы убедиться, что значение subscription является одним из
+допустимых значений: ['starter', 'pro', 'business'].
+
+- Обновляется ваш файл маршрутов _`users.js`_ в папке **routes** для добавления
+  нового маршрута `@ PATCH /users`
+
+```js
+// routes/users.js
+router.patch('/:id/subscription', authenticate, isValidId);
+```
+
+- Создается контроллер для обработки обновления подписки. Затем он добавляется в
+  _`users.js`_
+
+```js
+// controllers/users/updateSubscription.js
+router.patch(
+  '/:id/subscription',
+  authenticate,
+  isValidId,
+  ctrlWrapper(ctrl.updateSubscription),
+);
+```
+
+- Добавляется валидация для значения `subscription` с помощью `Joi` в модель
+  пользователя
+
+```js
+// models/user.js
+const updateUserSubscriptionSchema = Joi.object({
+  subscription: Joi.string()
+    .valid('starter', 'pro', 'business')
+    .required()
+    .messages({
+      'any.only': 'Subscription must be one of: starter, pro or business',
+      'string.empty': 'Subscription cannot be an empty field',
+      'any.required': 'Subscription is a required field',
+    }),
+});
+```
+
+- Валидация добавляется в _`users.js`_
+
+```js
+// controllers/users/updateSubscription.js
+router.patch(
+  '/:id/subscription',
+  authenticate,
+  isValidId,
+  validateBody(schemas.updateUserSubscriptionSchema),
+  ctrlWrapper(ctrl.updateSubscription),
+);
+```
+
+### 9. Логаут.
