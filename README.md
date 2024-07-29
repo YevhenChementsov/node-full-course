@@ -5,16 +5,18 @@
 
 ---
 
-Создание коллекции пользователей users. Добавление логики
-аутентификации/авторизации пользователя с помощью JWT токена. Получение данных
-юзера по токену. Фильтрация и пагинация контактов. Обновление подписки
-пользователя. Логаут.
+Создание коллекции пользователей 'users'. Добавление аутентификации/авторизации
+пользователя с помощью JWT токена. Разлогинивание пользователя. Получение данных
+текущего пользователя по токену. Пагинация контактов. Фильтрация контактов по
+полю 'favorite'. Обновление подписки пользователя ('starter', 'pro',
+'business').
 
 ---
 
 ### 1. Создание схемы и модели пользователя для коллекции users.
 
-В коде создается схема и модель пользователя для коллекции users.
+1.1. В коде создается схема и модель пользователя для коллекции
+[users](./models/user.js).
 
 ```js
 // models/user.js
@@ -23,6 +25,7 @@
     type: String,
     minlength: 3,
     maxlength: 30,
+    required: [true, 'Name is required'],
   },
   password: {
     type: String,
@@ -51,8 +54,8 @@
 { versionKey: false, timestamps: true },
 ```
 
-Чтобы каждый пользователь работал и видел только свои контакты в схеме контактов
-добавляется свойство `owner`.
+1.2. Чтобы каждый пользователь работал и видел только свои контакты в схеме
+контактов добавляется свойство `owner`.
 
 ```js
 // models/contacts.js
@@ -70,389 +73,302 @@ owner: {
 
 ### 2. Регистрация пользователя.
 
-Создается эндпоинт `/api/auth/signup`.
+2.1. Создается эндпоинт [`/api/auth/signup`](#registration-request).
 
-Для этого в папке **routes** создается файл _`auth.js`_, который будет отвечать
-за все маршруты, связанные с регистрацией, авторизацией и разлогиниванием.
-Создается и экспортируется рутер. Добавляется, пока без валидации и контроллера
-эндпоинт регистрации пользователя.
+2.2. Делается валидация всех обязательных полей (`name`, `email`, `password`).
+При ошибке валидации возвращает [Bad Request](#registration-validation-error).
+
+2.3. В случае успешной валидации в модели `User` создается пользователь по
+данным которые прошли валидацию. Для засолки пароля пользователя перед записью в
+базу данных используется [bcrypt](https://www.npmjs.com/package/bcrypt) или
+[bcrypt.js](https://www.npmjs.com/package/bcryptjs).
+
+- Если пользователь с таким `email` уже зарегистрирован, то возвращает
+  [Conflict](#registration-conflict-error)
+- Если все хорошо - [Created](#registration-success-response).
+
+##### Registration request
 
 ```js
-// routes/auth.js
-const { Router } = require('express');
-
-const router = Router();
-
-router.post('/signup');
-
-module.exports = router;
+@POST /api/auth/signup
+Content-Type: application/json
+RequestBody: {
+  "name":"example name",
+  "email": "example@example.com",
+  "password": "example password"
+}
 ```
 
-Рутер импортируется в файл _`app.js`_.
+##### Registration validation error
 
 ```js
-// app.js
-...
-const contactsRouter = require('./routes/contacts');
-const authRouter = require('./routes/auth');
-...
-app.use('/api/contacts', contactsRouter);
-app.use('/api/auth', authRouter);
+Status: 400 Bad Request
+Content-Type: application/json
+ResponseBody: <Ошибка от Joi или другой библиотеки валидации>
 ```
 
-В файл _`user.js`_ что в папке **models** добавляется и экспортируется
-Joi-валидация необходимых полей при регистрации (`name`, `email` и `password`).
+##### Registration conflict error
 
 ```js
-// models/user.js
-...
-const signUpSchema = Joi.object({
-  name: Joi.string()
-    .pattern(regexp.nameRegExp)
-    .min(3)
-    .max(30)
-    .required()
-    .messages({
-      'string.base': 'Name should be a string',
-      'string.pattern.base': 'Name should be a string',
-      'string.empty': 'Name cannot be an empty field',
-      'string.min': 'Name should have a minimum of {#limit} letters',
-      'string.max': 'Name should have a maximum of {#limit} letters',
-      'any.required': 'Name is a required field',
-    }),
-  email: Joi.string().pattern(regexp.emailRegExp).required().messages({
-    'string.email': 'Please enter a valid email address',
-    'string.empty': 'Email cannot be an empty field',
-    'any.required': 'Email is a required field',
-  }),
-  password: Joi.string().min(6).required().messages({
-    'string.min': 'Password should have a minimum of {#limit} symbols',
-    'string.empty': 'Password cannot be an empty field',
-    'any.required': 'Password is a required field',
-  }),
-});
-
-const schemas = {
-  signUpSchema,
-};
-
-module.exports = {
-  User,
-  schemas,
-};
+Status: 409 Conflict
+Content-Type: application/json
+ResponseBody: {
+  "message": "User with this email already exists"
+}
 ```
 
-В проект устанавливаем библиотеку [bcrypt](https://www.npmjs.com/package/bcrypt)
-для засолки пароля пользователя перед записью в базу данных. В папке
-**controllers** создается папка **auth** с файлом _`signup.js`_. В файле
-создается контроллер-функция `signUp()` для создания пользователя по данным,
-которые прошли валидацию.
-
-- Если пользователь с таким `email` уже зарегистрирован, то возвращается http
-  ошибка `409 Conflict` с текстом `'User with this email already exists'`
-- Если успешно - статус `201 Created` и пользователя
-  `{ name: newUser.name, email: newUser.email, }`
-
-В файл _`auth.js`_, что в папке **routes**, добавляются валидация и контроллер.
+##### Registration success response
 
 ```js
-// routes/auth.js
-...
-const { auth: ctrl } = require('../controllers');
-const { ctrlWrapper } = require('../helpers');
-const { validateBody } = require('../middlewares');
-const { schemas } = require('../models/user');
-...
-router.post('/signup', validateBody(schemas.signUpSchema), ctrlWrapper(ctrl.signUp));
+Status: 201 Created
+Content-Type: application/json
+ResponseBody: {
+  "user": {
+    "name":"example name",
+    "email": "example@example.com",
+    "subscription": "starter"
+  }
+}
 ```
 
 ---
 
 ### 3. Авторизация (Логин).
 
-Создается эндпоинт `/api/auth/signin`.
+3.1. Создается эндпоинт [`/api/auth/signin`](#login-request).
 
-В файл _`user.js`_ что в папке **models** добавляется и экспортируется
-Joi-валидация необходимых полей при авторизации (`email` и `password`).
+3.2. Делается валидация всех обязательных полей (`email` и `password`). При
+ошибке валидации вернуть [Bad Request](#login-validation-error).
+
+3.3. В модели `User` найти зарегистрированного пользователя по `email`.
+
+- Если пользователь с таким `email` отсутствует в базе данных, то возвращает
+  [Unauthorized](#login-auth-error).
+- Если пользователь с таким `email` есть, сравнивается захешированный пароль из
+  базы данных с введенным.
+- Если пароли не совпадают, то возвращает [Unauthorized](#login-auth-error).
+- Если пароли совпадают, то создается `token` с помощью библиотеки
+  [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken), сохраняется в
+  текущем пользователе и возвращается [Ok](#login-success-response).
+
+##### Login request
 
 ```js
-// models/user.js
-...
-const signInSchema = Joi.object({
-  email: Joi.string().pattern(regexp.emailRegExp).required().messages({
-    'string.email': 'Please enter a valid email address',
-    'string.empty': 'Email cannot be an empty field',
-    'any.required': 'Email is a required field',
-  }),
-  password: Joi.string().min(6).required().messages({
-    'string.min': 'Password should have a minimum of {#limit} symbols',
-    'string.empty': 'Password cannot be an empty field',
-    'any.required': 'Password is a required field',
-  }),
-});
-
-const schemas = {
-  signUpSchema,
-  signInSchema,
-};
-
-module.exports = {
-  User,
-  schemas,
-};
+@POST /api/auth/signin
+Content-Type: application/json
+RequestBody: {
+  "email": "example@example.com",
+  "password": "examplepassword"
+}
 ```
 
-Создается файл _`signin.js`_ в папке **controllers/auth**. В файле создается
-контроллер-функция `signIn()` для проверки и авторизации существующего
-пользователя по данным, которые прошли валидацию (`email` и `password`).
-
-- Если `email` не существует в базе данных, то выбрасывается ошибка со статусом
-  `401` и сообщением `'Invalid email or password'`
-- Если `email` существует в базе данных, но `password` не совпадает, то
-  выбрасывается ошибка со статусом `401` и сообщением
-  `'Invalid email or password'`
-- Если успешно - сгенерировать и вернуть токен `{ token: generated token }` со
-  статусом `200`
-
-Для генерации токена используется библиотека
-[jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken).
-
-Чтобы сгенерировать токен в файл _`.env`_ добавляется секретный ключ
-(SECRET_KEY). Он может быть произвольным или сгенерирован с помощью сайта
-(например [randomkeygen](https://randomkeygen.com/)).
-
-Далее в контроллер авторизации - `signIn()`-функцию импортируется jwt
-библиотека, SECRET_KEY из `process.env`. Создается `payload` необходимый для
-генерации jwt токена.
-
-Создается токен из `payload`, `SECRET_KEY` и объекта настроек, в котором
-указывается время жизни токена.
+##### Login validation error
 
 ```js
-// signin.js
-...
-const jwt = require('jsonwebtoken');
+Status: 400 Bad Request
+Content-Type: application/json
+ResponseBody: <Ошибка от Joi или другой библиотеки  валидации>
+```
 
-const { SECRET_KEY } = process.env;
-...
-const payload = {
-  id: user._id,
+##### Login auth error
+
+```js
+Status: 401 Unauthorized
+ResponseBody: {
+  "message": "Email or password is wrong"
 }
-const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+```
+
+##### Login success response
+
+```js
+Status: 200 OK
+Content-Type: application/json
+ResponseBody: {
+  "token": "example token",
+  "user": {
+    "email": "example@example.com",
+    "subscription": "starter"
+  }
+}
 ```
 
 ### 4. Проверка / Аутентификация токена.
 
-Создается мидлвара _`authenticate.js`_ в папке **middlewares** для проверки
-токена и добавляется ко всем маршрутам контактов, которые должны быть защищены.
+4.1. Создается мидлвар [authenticate](./middlewares/authenticate.js) для
+проверки токена и добавляется ко всем маршрутам контактов, которые должны быть
+защищены.
 
-- Мидлвар берет токен из заголовков `Authorization`, проверяет токен на
-  валидность
-
-```js
-// authenticate.js
-const { authorization = '' } = req.headers;
-const [bearer, token] = authorization.split(' ');
-```
-
-- Если токен не валидный, выбрасывает ошибку со статусом `401` и сообщением
-  `'Unauthorized'`
-
-```js
-// authenticate.js
-if (bearer !== 'Bearer') {
-  next(HttpError(401));
-}
-```
-
+- Мидлвар берет токен из заголовков `Authorization` и проверяет токен на
+  валидность.
+- Если токен не валидный, то возвращает
+  [Unauthorized](#middleware-unauthorized-error).
 - Если валидация прошла успешно, получить из токена `id` пользователя. Найти
-  пользователя в базе данных по этому `id`
+  пользователя в базе данных по этому `id`.
+- Если пользователя с таким `id` не существует или токены не совпадают, то
+  возвращает [Unauthorized](#middleware-unauthorized-error).
+- Если пользователь существует и токен совпадает с тем, что находится в базе,
+  записать его данные в `req.user` и вызвать метод `next()`.
+
+##### Middleware unauthorized error
 
 ```js
-// authenticate.js
-const { id } = jwt.verify(token, SECRET_KEY);
-const user = await User.findById(id);
-```
-
-- Если пользователя с таким `id` не существует или токены не совпадают, вернуть
-  ошибку со статусом `401` и сообщением `'Unauthorized'`
-
-```js
-// authenticate.js
-if (!user) {
-  next(HttpError(401, 'User not found.'));
+Status: 401 Unauthorized
+Content-Type: application/json
+ResponseBody: {
+  "message": "Unauthorized"
 }
 ```
 
-- Если пользователь существует и токен совпадает с тем, что находится в базе,
-  записать его данные в `req.user` и вызвать метод `next()`
+### 5. Логаут.
+
+5.1. Создается эндпоинт [`/api/auth/signout`](#logout-request).
+
+5.2. Добавляется в маршрут [authenticate](./middlewares/authenticate.js) для
+проверки токена / аутентификации.
+
+5.3. В модели `User` найти пользователя по `_id`.
+
+- Если пользователя не существует, то вернуть
+  [Unauthorized](#logout-unauthorized-error).
+- Если пользователь найден, то поле `token` текущего пользователя делается
+  `null` и возвращается [No Content](#logout-success-response).
+
+##### Logout request
 
 ```js
-// authenticate.js
-req.user = user;
-next();
+@GET /api/auth/signout
+Authorization: 'Bearer {{token}}';
 ```
 
-После того как данные пользователя записаны, при добавлении контакта, с
-`req.user` берется `id` пользователя и добавляется к запросу. После этого все
-добавленные контакты будут приписываться в базе данных только к залогиненому
-пользователю `_id: owner`.
+##### Logout unauthorized error
 
 ```js
-// controllers/contacts/add.js
-const { _id: owner } = req.user;
-const result = await Contact.create({ ...req.body, owner });
+Status: 401 Unauthorized
+Content-Type: application/json
+ResponseBody: {
+  "message": "Unauthorized"
+}
 ```
 
-Тоже самое делается и с запросом всех контактов.
+##### Logout success response
 
 ```js
-// controllers/contacts/getAll.js
-const { _id: owner } = req.user;
-const result = await Contact.find({ owner });
+Status: 204 No Content
 ```
 
-Теперь пользователь будет получать только свои контакты. Чтобы при запросе в
-поле `owner` записывало не `id`, а например имя и почту пользователя, который
-делает запрос, после запроса добавляется `populate()`.
+### 6. Текущий пользователь - получение данных пользователя по токену.
+
+6.1. Создается эндпоинт [`/api/users/current`](#current-user-request).
+
+6.2. Добавляется в маршрут [authenticate](./middlewares/authenticate.js) для
+проверки токена / аутентификации.
+
+- Если пользователь не найден, токен не правильный или его время истекло -
+  возвращает [Unauthorized](#current-user-unauthorized-error).
+- Если пользователь найден, то возвращает [Ok](#current-user-success-response).
+
+##### Current user request
 
 ```js
-// controllers/contacts/getAll.js
-const result = await Contact.find({ owner }).populate('owner', 'name email');
+@GET /api/users/current
+Authorization: "Bearer {{token}}"
 ```
 
-Мидлвар _`authenticate`_ добавляется ко всем CRUD-запросам рута _`contacts.js`_.
+##### Current user unauthorized error
 
-### 5. Пагинация для коллекции контактов @ GET /contacts?page=1&limit=20.
+```js
+Status: 401 Unauthorized
+Content-Type: application/json
+ResponseBody: {
+  "message": "Unauthorized"
+}
+```
 
-Для получения параметров поиска из строки запроса используется `req.query`. В
-функции-контроллере _`getAll.js`_ что в папке **controllers/contacts/** из
-объекта `req.query` берутся `page` и `limit`. По умолчанию параметр `page`
-ставится `1`, а параметр `limit` - `10`.
+##### Current user success response
+
+```js
+Status: 200 OK
+Content-Type: application/json
+ResponseBody: {
+  "email": "example@example.com",
+  "subscription": "starter"
+}
+```
+
+### 7. Пагинация для коллекции контактов @GET /api/contacts?page=1&limit=10.
+
+7.1. Для того, чтобы сделать пагинацию при запросе на вывод всех контактов
+пользователя нужно отредактировать функцию-контроллер
+[getAll](./controllers/contacts/getAll.js). Для получения параметров поиска из
+строки запроса используется `req.query`.
 
 ```js
 // controllers/contacts/getAll.js
 const { page = 1, limit = 10 } = req.query;
 ```
 
-В методе `find()` при запросе третьим аргументом прописываются встроенные в
+7.2. В методе `find()` при запросе третьим аргументом прописываются встроенные в
 mongoose дополнительные настройки (`skip` и `limit`). `skip` высчитывается по
-формуле `(page - 1) * limit`. В результате возвращается:
+формуле `(page - 1) * limit`.
+
+### 8. Фильтрация контактов по полю избранного @GET /api/contacts?favorite=true.
+
+8.1. Для того, чтобы отфильтровать контакты, оставив те, где `favorite=true` в
+функции-контроллере [getAll](./controllers/contacts/getAll.js) из `req.query`
+кроме `page` и `limit` еще берется `favorite`.
+
+8.2. Делается проверка, есть ли в контакте поле `favorite` со значением `true`.
+
+### 9. Обновление подписки (subscription) пользователя через эндпоинт @PATCH /api/users.
+
+9.1. Создается эндпоинт [`/api/users/:id/subscription`](#subscription-request).
+
+9.2. Делается валидация поля `subscription`, чтобы убедиться, что значение
+`subscription` является одним из допустимых значений: ['starter', 'pro',
+'business']. При ошибке валидации вернуть
+[Bad Request](#subscription-validation-error).
+
+9.3. В модели `User` найти зарегистрированного пользователя по `_id`.
+
+- Если пользователь с таким `_id` отсутствует в базе данных, то возвращает
+  [Not Found](#subscription-id-not-found).
+- Если все хорошо - возвращает [обновленный объект контакта]().
+
+##### Subscription request
 
 ```js
-// controllers/contacts/getAll.js
-const result = await Contact.find({ owner }, '', {
-  skip,
-  limit,
-}).populate('owner', 'name email');
-
-res.json(result);
-```
-
-### 6. Текущий пользователь - получение данных юзера по токену.
-
-Создается эндпоинт `/api/users/current`.
-
-- Создается рут `@ GET /current` в файле _`users.js`_, в папке **routes**. Также
-  импортируется _`authenticate`_ из папки **middlewares** и _`ctrlWrapper`_ из
-  папки **helpers**. В файле _`app.js`_ создается _`usersRouter`_. Для нового
-  рута создается контроллер
-- Мидлвар _`authenticate`_ проверяет токен авторизированного пользователя
-- Если пользователь не найден, токен не правильный или его время истекло -
-  выбрасывается ошибка со статусом `401` и сообщением `'Unauthorized'`
-- Если все хорошо, функция-контроллер возвращает статус `200` и объект с именем
-  пользователя и его подпиской
-
-```js
-// controllers/users/getCurrentUser.js
-const getCurrentUser = async (req, res) => {
-  const { name, subscription } = req.user;
-
-  res.json({
-    name,
-    subscription,
-  });
-};
-```
-
-### 7. Фильтрация контактов по полю избранного @ GET /contacts?favorite=true
-
-Для того, чтобы отфильтровать контакты в функции-контроллере _`getAll.js`_ что в
-папке **controllers/contacts/** из объекта `req.query` кроме `page` и `limit`
-еще берется `favorite` и делается проверка с помощью оператора `if(){}`.
-
-```js
-// controllers/contacts/getAll.js
-...
-const { page = 1, limit = 10, favorite } = req.query;
-...
-const getFavorite = { owner };
-if (favorite) {
-  getFavorite.favorite = favorite === 'true';
+@PATCH /api/users/:id/subscription
+Content-Type: application/json
+RequestBody: {
+  "subscription": "one of: starter, pro or business"
 }
-const result = await Contact.find(getFavorite, '', {
-  skip,
-  limit,
-}).populate('owner', 'name email');
 ```
 
-### 8. Обновление подписки (subscription) пользователя через эндпоинт @ PATCH /users.
-
-Чтобы добавить возможность обновления подписки пользователя через эндпоинт @
-PATCH /users, нужно создать маршрут, который будет обрабатывать запрос на
-обновление поля subscription в модели пользователя. Также нужно добавить
-валидацию, чтобы убедиться, что значение subscription является одним из
-допустимых значений: ['starter', 'pro', 'business'].
-
-- Обновляется ваш файл маршрутов _`users.js`_ в папке **routes** для добавления
-  нового маршрута `@ PATCH /users`
+##### Subscription validation error
 
 ```js
-// routes/users.js
-router.patch('/:id/subscription', authenticate, isValidId);
+Status: 400 Bad Request
+Content-Type: application/json
+ResponseBody: <Ошибка от Joi или другой библиотеки  валидации>
 ```
 
-- Создается контроллер для обработки обновления подписки. Затем он добавляется в
-  _`users.js`_
+##### Subscription id not found
 
 ```js
-// controllers/users/updateSubscription.js
-router.patch(
-  '/:id/subscription',
-  authenticate,
-  isValidId,
-  ctrlWrapper(ctrl.updateSubscription),
-);
+Status: 404 Not Found
+Content-Type: application/json
+ResponseBody: {
+  "message": "User not found"
+}
 ```
 
-- Добавляется валидация для значения `subscription` с помощью `Joi` в модель
-  пользователя
+##### Subscription success response
 
 ```js
-// models/user.js
-const updateUserSubscriptionSchema = Joi.object({
-  subscription: Joi.string()
-    .valid('starter', 'pro', 'business')
-    .required()
-    .messages({
-      'any.only': 'Subscription must be one of: starter, pro or business',
-      'string.empty': 'Subscription cannot be an empty field',
-      'any.required': 'Subscription is a required field',
-    }),
-});
+Status: 200 OK
+Content-Type: application/json
+ResponseBody: {
+  user
+}
 ```
-
-- Валидация добавляется в _`users.js`_
-
-```js
-// controllers/users/updateSubscription.js
-router.patch(
-  '/:id/subscription',
-  authenticate,
-  isValidId,
-  validateBody(schemas.updateUserSubscriptionSchema),
-  ctrlWrapper(ctrl.updateSubscription),
-);
-```
-
-### 9. Логаут.

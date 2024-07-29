@@ -17,6 +17,7 @@ const signUp = async (req, res) => {
   res.status(201).json({
     name: newUser.name,
     email: newUser.email,
+    subscription: newUser.subscription,
   });
 };
 

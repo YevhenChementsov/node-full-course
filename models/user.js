@@ -52,7 +52,8 @@ const signUpSchema = Joi.object({
     .required()
     .messages({
       'string.base': 'Name should be a string',
-      'string.pattern.base': 'Name should be a string',
+      'string.pattern.base':
+        'Name must consist only of Latin or Cyrillic letters',
       'string.empty': 'Name cannot be an empty field',
       'string.min': 'Name should have a minimum of {#limit} letters',
       'string.max': 'Name should have a maximum of {#limit} letters',
@@ -60,6 +61,7 @@ const signUpSchema = Joi.object({
     }),
   email: Joi.string().pattern(regexp.emailRegExp).required().messages({
     'string.email': 'Please enter a valid email address',
+    'string.pattern.base': 'Please enter a valid email address',
     'string.empty': 'Email cannot be an empty field',
     'any.required': 'Email is a required field',
   }),
@@ -73,6 +75,7 @@ const signUpSchema = Joi.object({
 const signInSchema = Joi.object({
   email: Joi.string().pattern(regexp.emailRegExp).required().messages({
     'string.email': 'Please enter a valid email address',
+    'string.pattern.base': 'Please enter a valid email address',
     'string.empty': 'Email cannot be an empty field',
     'any.required': 'Email is a required field',
   }),

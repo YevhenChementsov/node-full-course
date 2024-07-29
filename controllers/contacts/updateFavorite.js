@@ -10,7 +10,7 @@ const updateFavorite = async (req, res) => {
     { new: true },
   );
   if (!result) {
-    throw HttpError(404, 'Not found');
+    throw HttpError(404, 'User not found');
   }
 
   res.json(result);
