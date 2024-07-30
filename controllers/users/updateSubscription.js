@@ -13,7 +13,11 @@ const updateSubscription = async (req, res) => {
     throw HttpError(404, 'User not found');
   }
 
-  res.json(result);
+  res.json({
+    status: 'success',
+    code: 200,
+    user: result,
+  });
 };
 
 module.exports = updateSubscription;

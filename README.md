@@ -185,13 +185,15 @@ ResponseBody: {
 Status: 200 OK
 Content-Type: application/json
 ResponseBody: {
-  "token": "example token",
+  "token": "example token"
   "user": {
-    "email": "example@example.com",
+    "name":"example name",
     "subscription": "starter"
-  }
+  },
 }
 ```
+
+---
 
 ### 4. Проверка / Аутентификация токена.
 
@@ -219,6 +221,8 @@ ResponseBody: {
   "message": "Unauthorized"
 }
 ```
+
+---
 
 ### 5. Логаут.
 
@@ -257,6 +261,8 @@ ResponseBody: {
 Status: 204 No Content
 ```
 
+---
+
 ### 6. Текущий пользователь - получение данных пользователя по токену.
 
 6.1. Создается эндпоинт [`/api/users/current`](#current-user-request).
@@ -291,10 +297,16 @@ ResponseBody: {
 Status: 200 OK
 Content-Type: application/json
 ResponseBody: {
-  "email": "example@example.com",
+  "name": "example name",
   "subscription": "starter"
 }
 ```
+
+---
+
+## Дополнительное задание
+
+---
 
 ### 7. Пагинация для коллекции контактов @GET /api/contacts?page=1&limit=10.
 
@@ -312,6 +324,8 @@ const { page = 1, limit = 10 } = req.query;
 mongoose дополнительные настройки (`skip` и `limit`). `skip` высчитывается по
 формуле `(page - 1) * limit`.
 
+---
+
 ### 8. Фильтрация контактов по полю избранного @GET /api/contacts?favorite=true.
 
 8.1. Для того, чтобы отфильтровать контакты, оставив те, где `favorite=true` в
@@ -320,7 +334,9 @@ mongoose дополнительные настройки (`skip` и `limit`). `s
 
 8.2. Делается проверка, есть ли в контакте поле `favorite` со значением `true`.
 
-### 9. Обновление подписки (subscription) пользователя через эндпоинт @PATCH /api/users.
+---
+
+### 9. Обновление подписки (subscription) пользователя через эндпоинт @PATCH /api/users/:id/subscription.
 
 9.1. Создается эндпоинт [`/api/users/:id/subscription`](#subscription-request).
 
@@ -333,7 +349,8 @@ mongoose дополнительные настройки (`skip` и `limit`). `s
 
 - Если пользователь с таким `_id` отсутствует в базе данных, то возвращает
   [Not Found](#subscription-id-not-found).
-- Если все хорошо - возвращает [обновленный объект контакта]().
+- Если все хорошо - возвращает
+  [обновленный объект контакта](#subscription-success-response).
 
 ##### Subscription request
 

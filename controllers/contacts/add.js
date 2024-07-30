@@ -4,7 +4,11 @@ const add = async (req, res) => {
   const { _id: owner } = req.user;
   const result = await Contact.create({ ...req.body, owner });
 
-  res.status(201).json(result);
+  res.status(201).json({
+    status: 'success',
+    code: 201,
+    contact: result,
+  });
 };
 
 module.exports = add;

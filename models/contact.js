@@ -62,7 +62,7 @@ const addSchema = Joi.object({
   phone: Joi.string().pattern(regexp.phoneRegExp).required().messages({
     'string.pattern.base': 'Phone number must be in the format (012) 345-67-89',
     'string.empty': 'Phone number cannot be an empty field',
-    'any.required': 'Phone number is a required field',
+    'any.required': 'Phone is a required field',
   }),
   favorite: Joi.bool(),
 });

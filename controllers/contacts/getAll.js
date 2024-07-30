@@ -13,7 +13,11 @@ const getAll = async (req, res) => {
     limit,
   }).populate('owner', 'name email');
 
-  res.json(result);
+  res.json({
+    status: 'success',
+    code: 200,
+    contacts: result,
+  });
 };
 
 module.exports = getAll;

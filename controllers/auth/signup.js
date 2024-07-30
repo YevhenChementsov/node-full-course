@@ -15,9 +15,13 @@ const signUp = async (req, res) => {
   const newUser = await User.create({ ...req.body, password: hashedPassword });
 
   res.status(201).json({
-    name: newUser.name,
-    email: newUser.email,
-    subscription: newUser.subscription,
+    status: 'success',
+    code: 201,
+    user: {
+      name: newUser.name,
+      email: newUser.email,
+      subscription: newUser.subscription,
+    },
   });
 };
 

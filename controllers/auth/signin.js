@@ -23,7 +23,13 @@ const signIn = async (req, res) => {
   await User.findByIdAndUpdate(user._id, { token });
 
   res.status(200).json({
+    status: 'success',
+    code: 200,
     token,
+    user: {
+      name: user.name,
+      subscription: user.subscription,
+    },
   });
 };
 
