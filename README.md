@@ -23,21 +23,21 @@
 {
   name: {
     type: String,
-    minlength: 3,
-    maxlength: 30,
+    minlength: "your number",
+    maxlength: "your number",
     required: [true, 'Name is required'],
   },
   password: {
     type: String,
     minlength: [
-      6,
+      "your number",
       'The value is shorter than the minimum allowed length ({MINLENGTH}).',
     ],
     required: [true, 'Password is required'],
   },
   email: {
     type: String,
-    match: regexp.emailRegExp,
+    match: "any regular expression for email"
     required: [true, 'Email is required'],
     unique: true,
   },
@@ -73,10 +73,11 @@ owner: {
 
 ### 2. Регистрация пользователя.
 
-2.1. Создается эндпоинт [`/api/auth/signup`](#registration-request).
+2.1. Создается эндпоинт [`/api/auth/signup`](#запрос-на-регистрацию).
 
 2.2. Делается валидация всех обязательных полей (`name`, `email`, `password`).
-При ошибке валидации возвращает [Bad Request](#registration-validation-error).
+При ошибке валидации возвращает
+[Bad Request](#ошибка-валидации-при-регистрации).
 
 2.3. В случае успешной валидации в модели `User` создается пользователь по
 данным которые прошли валидацию. Для засолки пароля пользователя перед записью в
@@ -84,10 +85,10 @@ owner: {
 [bcrypt.js](https://www.npmjs.com/package/bcryptjs).
 
 - Если пользователь с таким `email` уже зарегистрирован, то возвращает
-  [Conflict](#registration-conflict-error)
-- Если все хорошо - [Created](#registration-success-response).
+  [Conflict](#ошибка-конфликт-при-регистрации).
+- Если все хорошо - [Created](#ответ-успешной-регистрации).
 
-##### Registration request
+##### Запрос на регистрацию
 
 ```js
 @POST /api/auth/signup
@@ -99,7 +100,7 @@ RequestBody: {
 }
 ```
 
-##### Registration validation error
+##### Ошибка валидации при регистрации
 
 ```js
 Status: 400 Bad Request
@@ -107,7 +108,7 @@ Content-Type: application/json
 ResponseBody: <Ошибка от Joi или другой библиотеки валидации>
 ```
 
-##### Registration conflict error
+##### Ошибка-конфликт при регистрации
 
 ```js
 Status: 409 Conflict
@@ -117,7 +118,7 @@ ResponseBody: {
 }
 ```
 
-##### Registration success response
+##### Ответ успешной регистрации
 
 ```js
 Status: 201 Created
@@ -135,34 +136,35 @@ ResponseBody: {
 
 ### 3. Авторизация (Логин).
 
-3.1. Создается эндпоинт [`/api/auth/signin`](#login-request).
+3.1. Создается эндпоинт [`/api/auth/signin`](#запрос-на-вход).
 
 3.2. Делается валидация всех обязательных полей (`email` и `password`). При
-ошибке валидации вернуть [Bad Request](#login-validation-error).
+ошибке валидации вернуть [Bad Request](#ошибка-валидации-логина).
 
 3.3. В модели `User` найти зарегистрированного пользователя по `email`.
 
 - Если пользователь с таким `email` отсутствует в базе данных, то возвращает
-  [Unauthorized](#login-auth-error).
+  [Unauthorized](#ошибка-авторизации-логина).
 - Если пользователь с таким `email` есть, сравнивается захешированный пароль из
   базы данных с введенным.
-- Если пароли не совпадают, то возвращает [Unauthorized](#login-auth-error).
+- Если пароли не совпадают, то возвращает
+  [Unauthorized](#ошибка-авторизации-логина).
 - Если пароли совпадают, то создается `token` с помощью библиотеки
   [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken), сохраняется в
-  текущем пользователе и возвращается [Ok](#login-success-response).
+  текущем пользователе и возвращается [Ok](#ответ-об-успешном-входе).
 
-##### Login request
+##### Запрос на вход
 
 ```js
 @POST /api/auth/signin
 Content-Type: application/json
 RequestBody: {
   "email": "example@example.com",
-  "password": "examplepassword"
+  "password": "example password"
 }
 ```
 
-##### Login validation error
+##### Ошибка валидации логина
 
 ```js
 Status: 400 Bad Request
@@ -170,7 +172,7 @@ Content-Type: application/json
 ResponseBody: <Ошибка от Joi или другой библиотеки  валидации>
 ```
 
-##### Login auth error
+##### Ошибка авторизации логина
 
 ```js
 Status: 401 Unauthorized
@@ -179,7 +181,7 @@ ResponseBody: {
 }
 ```
 
-##### Login success response
+##### Ответ об успешном входе
 
 ```js
 Status: 200 OK
@@ -204,15 +206,15 @@ ResponseBody: {
 - Мидлвар берет токен из заголовков `Authorization` и проверяет токен на
   валидность.
 - Если токен не валидный, то возвращает
-  [Unauthorized](#middleware-unauthorized-error).
+  [Unauthorized](#мидлвар-ошибка-авторизации).
 - Если валидация прошла успешно, получить из токена `id` пользователя. Найти
   пользователя в базе данных по этому `id`.
 - Если пользователя с таким `id` не существует или токены не совпадают, то
-  возвращает [Unauthorized](#middleware-unauthorized-error).
+  возвращает [Unauthorized](#мидлвар-ошибка-авторизации).
 - Если пользователь существует и токен совпадает с тем, что находится в базе,
   записать его данные в `req.user` и вызвать метод `next()`.
 
-##### Middleware unauthorized error
+##### Мидлвар-ошибка авторизации
 
 ```js
 Status: 401 Unauthorized
@@ -226,7 +228,7 @@ ResponseBody: {
 
 ### 5. Логаут.
 
-5.1. Создается эндпоинт [`/api/auth/signout`](#logout-request).
+5.1. Создается эндпоинт [`/api/auth/signout`](#запрос-на-выход-из-системы).
 
 5.2. Добавляется в маршрут [authenticate](./middlewares/authenticate.js) для
 проверки токена / аутентификации.
@@ -234,18 +236,18 @@ ResponseBody: {
 5.3. В модели `User` найти пользователя по `_id`.
 
 - Если пользователя не существует, то вернуть
-  [Unauthorized](#logout-unauthorized-error).
+  [Unauthorized](#ошибка-неавторизованного-выхода-из-системы).
 - Если пользователь найден, то поле `token` текущего пользователя делается
-  `null` и возвращается [No Content](#logout-success-response).
+  `null` и возвращается [No Content](#ответ-на-успешный-выход-из-системы).
 
-##### Logout request
+##### Запрос на выход из системы
 
 ```js
 @GET /api/auth/signout
 Authorization: 'Bearer {{token}}';
 ```
 
-##### Logout unauthorized error
+##### Ошибка неавторизованного выхода из системы
 
 ```js
 Status: 401 Unauthorized
@@ -255,7 +257,7 @@ ResponseBody: {
 }
 ```
 
-##### Logout success response
+##### Ответ на успешный выход из системы
 
 ```js
 Status: 204 No Content
@@ -265,23 +267,24 @@ Status: 204 No Content
 
 ### 6. Текущий пользователь - получение данных пользователя по токену.
 
-6.1. Создается эндпоинт [`/api/users/current`](#current-user-request).
+6.1. Создается эндпоинт [`/api/users/current`](#запрос-текущего-пользователя).
 
 6.2. Добавляется в маршрут [authenticate](./middlewares/authenticate.js) для
 проверки токена / аутентификации.
 
 - Если пользователь не найден, токен не правильный или его время истекло -
-  возвращает [Unauthorized](#current-user-unauthorized-error).
-- Если пользователь найден, то возвращает [Ok](#current-user-success-response).
+  возвращает [Unauthorized](#ошибка-авторизации-текущего-пользователя).
+- Если пользователь найден, то возвращает
+  [Ok](#успешный-ответ-по-текущему-пользователю).
 
-##### Current user request
+##### Запрос текущего пользователя
 
 ```js
 @GET /api/users/current
 Authorization: "Bearer {{token}}"
 ```
 
-##### Current user unauthorized error
+##### Ошибка авторизации текущего пользователя
 
 ```js
 Status: 401 Unauthorized
@@ -291,7 +294,7 @@ ResponseBody: {
 }
 ```
 
-##### Current user success response
+##### Успешный ответ по текущему пользователю
 
 ```js
 Status: 200 OK
@@ -338,21 +341,21 @@ mongoose дополнительные настройки (`skip` и `limit`). `s
 
 ### 9. Обновление подписки (subscription) пользователя через эндпоинт @PATCH /api/users/:id/subscription.
 
-9.1. Создается эндпоинт [`/api/users/:id/subscription`](#subscription-request).
+9.1. Создается эндпоинт [`/api/users/:id/subscription`](#запрос-подписки).
 
 9.2. Делается валидация поля `subscription`, чтобы убедиться, что значение
 `subscription` является одним из допустимых значений: ['starter', 'pro',
 'business']. При ошибке валидации вернуть
-[Bad Request](#subscription-validation-error).
+[Bad Request](#ошибка-валидации-подписки).
 
 9.3. В модели `User` найти зарегистрированного пользователя по `_id`.
 
 - Если пользователь с таким `_id` отсутствует в базе данных, то возвращает
-  [Not Found](#subscription-id-not-found).
+  [Not Found](#пользователь-подписки-не-найден).
 - Если все хорошо - возвращает
-  [обновленный объект контакта](#subscription-success-response).
+  [обновленный объект контакта](#ответ-об-успешной-смене-подписки).
 
-##### Subscription request
+##### Запрос подписки
 
 ```js
 @PATCH /api/users/:id/subscription
@@ -362,7 +365,7 @@ RequestBody: {
 }
 ```
 
-##### Subscription validation error
+##### Ошибка валидации подписки
 
 ```js
 Status: 400 Bad Request
@@ -370,7 +373,7 @@ Content-Type: application/json
 ResponseBody: <Ошибка от Joi или другой библиотеки  валидации>
 ```
 
-##### Subscription id not found
+##### Пользователь подписки не найден
 
 ```js
 Status: 404 Not Found
@@ -380,7 +383,7 @@ ResponseBody: {
 }
 ```
 
-##### Subscription success response
+##### Ответ об успешной смене подписки
 
 ```js
 Status: 200 OK
