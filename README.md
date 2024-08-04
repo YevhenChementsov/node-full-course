@@ -42,8 +42,8 @@ http://localhost:<порт>/avatars/<имя файла с расширением
 ```js
 ...
 avatarURL: {
-	type: String,
-	required: true,
+  type: String,
+  required: true,
 },
 ...
 ```
@@ -117,9 +117,29 @@ ResponseBody: {
 ### 4. Unit-тестирование контроллера входа (signIn).
 
 4.1. Пишутся unit-тесты для контроллера входа (login/signin) при помощи
-[jest](https://www.npmjs.com/package/jest).
+[jest](https://www.npmjs.com/package/jest) и
+[supertest](https://www.npmjs.com/package/supertest). В _`package.json`_ нужно
+вставить в поле `scripts` ключ: "test", значение: "jest".
 
-- Ответ должен иметь статус-код `200`.
-- В ответе должен возвращаться токен.
-- В ответе должен возвращаться объект `user` с 2 полями `email` и
-  `subscription`, имеющие тип данных `String`.
+```json
+// package.json
+...
+"scripts": {
+  "start": "cross-env NODE_ENV=production node ./server.js",
+  ...
+  "test": "jest"
+},
+...
+```
+
+4.2. Для запуска тестов используется команда `yarn test`.
+
+Тест должен пройти следующие пункты:
+
+- Возвращает успешный ответ со статус-кодом 200.
+- Проверяет, что токен существует в ответе.
+- Проверяет, что токен действительно соответствует пользователю.
+- Проверяет, что токен сохраняется у пользователя в MongoDB
+- В ответ возвращает пользователя с полями email и subscription.
+- Поле email в ответе возвращается строкой.
+- Поле email в ответе возвращается строкой.

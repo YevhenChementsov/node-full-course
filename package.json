@@ -3,14 +3,16 @@
   "main": "app.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./server.js",
-    "dev": "cross-env NODE_ENV=development nodemon ./server.js"
+    "dev": "cross-env NODE_ENV=development nodemon ./server.js",
+    "test": "jest"
   },
   "repository": "https://github.com/YevhenChementsov/node-full-course/tree/rest-api-auth",
   "author": "Yevhen Chementsov <yevhenchementsov@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "jest": "^29.7.0",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "supertest": "^7.0.0"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
