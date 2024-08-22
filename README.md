@@ -106,4 +106,79 @@ ResponseBody: {
 
 ---
 
-<!-- ### 3. Третий шаг задания -->
+### 3. Отправка email пользователю с ссылкой для верификации.
+
+3.1. При регистрации пользователя:
+
+- Создается verificationToken для пользователя и записывается в БД (для
+  генерации токена верификации используется пакет
+  [uuid](https://www.npmjs.com/package/uuid) или
+  [nanoid](https://www.npmjs.com/package/nanoid)).
+- Отправляется письмо на почту пользователя и указывается ссылка для верификации
+  почты (`/api/auth/verify/:verificationToken`) в сообщении.
+- Запрещается авторизация пользователя при не верифицированной почте.
+
+---
+
+### 4. Повторная отправка email пользователю с ссылкой для верификации.
+
+Необходимо предусмотреть, вариант, что пользователь может случайно удалить
+письмо, оно может не дойти по какой-то причине к адресату, наш сервис отправки
+писем во время регистрации выдал ошибку и т.д.
+
+4.1. Создается эндпоинт [`/api/auth/verify/`]().
+
+<details>
+<summary>@ POST /api/auth/verify/</summary>
+
+- Получает `body` в формате `{ email }`.
+- Если в `body` нет обязательного поля `email`, возвращает json с ключом
+  `{"message": "missing required field email"}` и статусом `400`
+  [Bad Request]().
+- Если с `body` все хорошо, выполняет повторную отправку письма с
+  verificationToken на указанный email, но только если пользователь не
+  верифицирован, и возвращает json с ключом
+  `{ message: "Verification email sent"}` со статусом `200` [Ok]().
+- Если пользователь уже прошел верификацию отправляет json с ключом
+  `{ message: "Verification has already been passed"}` со статусом `400`
+  [Bad Request]().
+
+</details>
+
+##### Повторная отправка запроса верификации
+
+```js
+@POST /api/auth/verify/
+Content-Type: application/json
+RequestBody: {
+  "email": "example@example.com"
+}
+```
+
+##### Ошибка повторной отправки верификации почты
+
+```js
+Status: 400 Bad Request
+Content-Type: application/json
+ResponseBody: <Ошибка от Joi или другой библиотеки валидации>
+```
+
+##### Успешный ответ повторной отправки верификации почты
+
+```js
+Status: 200 Ok
+Content-Type: application/json
+ResponseBody: {
+  "message": "Verification email sent"
+}
+```
+
+##### Ошибка повторной отправки письма незарегистрированному пользователю
+
+```js
+Status: 400 Bad Request
+Content-Type: application/json
+ResponseBody: {
+  message: "Verification has already been passed"
+}
+```
