@@ -60,12 +60,12 @@
 ```js
 // models/user.js
 verify: {
-   type: Boolean,
-   default: false,
+  type: Boolean,
+  default: false
 },
 verificationToken: {
-   type: String,
-   default: null,
+  type: String,
+  default: null,
 }
 ```
 
@@ -126,7 +126,8 @@ ResponseBody: {
 письмо, оно может не дойти по какой-то причине к адресату, наш сервис отправки
 писем во время регистрации выдал ошибку и т.д.
 
-4.1. Создается эндпоинт [`/api/auth/verify/`]().
+4.1. Создается эндпоинт
+[`/api/auth/verify/`](#повторная-отправка-запроса-верификации).
 
 <details>
 <summary>@ POST /api/auth/verify/</summary>
@@ -134,14 +135,15 @@ ResponseBody: {
 - Получает `body` в формате `{ email }`.
 - Если в `body` нет обязательного поля `email`, возвращает json с ключом
   `{"message": "missing required field email"}` и статусом `400`
-  [Bad Request]().
+  [Bad Request](#ошибка-повторной-отправки-верификации-почты).
 - Если с `body` все хорошо, выполняет повторную отправку письма с
   verificationToken на указанный email, но только если пользователь не
   верифицирован, и возвращает json с ключом
-  `{ message: "Verification email sent"}` со статусом `200` [Ok]().
+  `{ message: "Verification email sent"}` со статусом `200`
+  [Ok](#успешный-ответ-повторной-отправки-верификации-почты).
 - Если пользователь уже прошел верификацию отправляет json с ключом
   `{ message: "Verification has already been passed"}` со статусом `400`
-  [Bad Request]().
+  [Bad Request](#ошибка-повторной-отправки-письма-верифицированному-пользователю).
 
 </details>
 
@@ -173,7 +175,7 @@ ResponseBody: {
 }
 ```
 
-##### Ошибка повторной отправки письма незарегистрированному пользователю
+##### Ошибка повторной отправки письма верифицированному пользователю
 
 ```js
 Status: 400 Bad Request
