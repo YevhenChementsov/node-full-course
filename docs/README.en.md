@@ -16,10 +16,10 @@ email to the user with a link for verification.
 - After registration, the user should receive an email on the specified at the
   registration email with a link to verify his email.
 - After clicking the link in the received email for the first time, the user
-  should get [Response](#response-successful-verification) with a status of
+  should get [Response](#successful-verification-response) with a status of
   `200`, which will imply that the email has been successfully verified.
 - Clicking the link again, the user should receive
-  [Error](#error-verification-error) with status `404`.
+  [Error](#resend-email-for-verified-user) with status `400`.
 
 ---
 
@@ -77,7 +77,7 @@ verificationToken: {
 - If the user with this token is not found, we need to return
   [Not Found](#verification-error).
 - If the user is found - set verificationToken to `null`, and set the verify
-  field to `true` and return [Ok](#response-successful-verification).
+  field to `true` and return [Ok](#successful-verification-response).
 
 ##### Verification Request
 
