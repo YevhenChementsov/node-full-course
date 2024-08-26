@@ -19,9 +19,10 @@ app.use('/api/contacts', contactsRouter);
 app.use('/api/users', usersRouter);
 
 app.use((_, res) => {
-  res
-    .status(404)
-    .json({ message: 'Route not found. Use api on routes: /api/contacts' });
+  res.status(404).json({
+    message:
+      'Route not found. Use api on routes: /api/auth/signup - for register, /api/auth/signin - for login',
+  });
 });
 
 app.use((err, req, res, next) => {
