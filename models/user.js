@@ -110,10 +110,20 @@ const updateUserSubscriptionSchema = Joi.object({
     }),
 });
 
+const emailVerifySchema = Joi.object({
+  email: Joi.string().pattern(regexp.emailRegExp).required().messages({
+    'string.email': 'Please enter a valid email address',
+    'string.pattern.base': 'Please enter a valid email address',
+    'string.empty': 'Email cannot be an empty field',
+    'any.required': 'Email is a required field',
+  }),
+});
+
 const schemas = {
   signUpSchema,
   signInSchema,
   updateUserSubscriptionSchema,
+  emailVerifySchema,
 };
 
 module.exports = {

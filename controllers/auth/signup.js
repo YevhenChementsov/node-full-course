@@ -41,6 +41,7 @@ const signUp = async (req, res) => {
       email: newUser.email,
       subscription: newUser.subscription,
     },
+    message: 'The email verification link has been sent to your mailbox',
   });
 };
 

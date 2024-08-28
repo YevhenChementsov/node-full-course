@@ -170,7 +170,7 @@ ResponseBody: <Error from Joi or other validation library>
 Status: 200 Ok
 Content-Type: application/json
 ResponseBody: {
-  "message": "Verification email sent"
+  "message": "The email verification link has been re-sent to your mailbox"
 }
 ```
 
