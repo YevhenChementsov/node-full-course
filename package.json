@@ -1,6 +1,6 @@
 {
-  "name": "node-full-course",
-  "repository": "https://github.com/YevhenChementsov/node-full-course/tree/main",
+  "name": "nodejs-course",
+  "repository": "https://github.com/YevhenChementsov/nodejs-course/tree/main",
   "author": "Yevhen Chementsov <yevhenchementsov@gmail.com>",
   "license": "MIT",
   "dependencies": {},
